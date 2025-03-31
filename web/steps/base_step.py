@@ -193,16 +193,6 @@ class BasePage(BaseLog):
             self.debug("Fell into timeout in alert_display()")
             return False
 
-    def page_load_waiter(self):
-        try:
-            WebDriverWait(self.driver, self.threshold).until(
-                EC.presence_of_element_located
-            )
-            return True
-        except TimeoutException:
-            self.debug("Fell into timeout in wait_page_read()")
-            return False
-
     @staticmethod
     def get_endpoint(endpoint, url):
         try:
@@ -248,28 +238,6 @@ class BasePage(BaseLog):
     def mouse_hover(self, loc):
         actions = ActionChains(self.driver)
         actions.move_to_element(self.driver.find_element(*loc)).perform()
-
-    def fluent_assertion(self, loc, expected_value):
-        self.debug('expected_value: ' + expected_value)
-        self.debug("str(expected_value.encode('utf-8')): " + str(expected_value.encode('utf-8')))
-        for i in range(self.threshold):
-            time.sleep(1)
-            self.debug('Fluent loop count: ' + str(i))
-            if expected_value in self.driver.find_element(*loc).text:
-                return True
-            elif i == self.threshold-1:
-                self.debug("str(self.driver.find_element(*loc).text.encode('utf-8') is: " +
-                           str(self.driver.find_element(*loc).text.encode('utf-8')))
-                assert self.driver.find_element(*loc).text == expected_value, (
-                    "Assertion failed: \n"
-                    "Expected value is: " + expected_value + '\n'
-                    "But the actual is: " + self.driver.find_element(*loc).text
-                )
-                # sys.exit(1)
-            else:
-                self.debug("self.driver.find_element(*loc).text is: " + self.driver.find_element(*loc).text)
-                self.debug("str(self.driver.find_element(*loc).text.encode('utf-8') is: " +
-                           str(self.driver.find_element(*loc).text.encode('utf-8')))
 
     def assert_element_not_exists(self, loc):
         try:
@@ -321,14 +289,6 @@ class BasePage(BaseLog):
         result_str = ''.join(random.choice(characters) for _ in range(length))
         return result_str
 
-    def generate_email(self):
-        email = self.generate_random_value().lower() + "@mailnator.com"
-        return email
-
-    def generate_random_number(self):
-        characters_string = '01234567789'
-        result = ''.join((random.choice(characters_string)) for x in range(9))
-        return result
 
     def get_all_list(self, locator):
         list_name = []
@@ -369,21 +329,4 @@ class BasePage(BaseLog):
            """, element)
         time.sleep(1) # I need this for it not to fail
         WebDriverWait(self.driver, 4).until(EC.visibility_of(element))
-
-    def staleness_of(self, loc):
-        try:
-            WebDriverWait(self.driver, self.threshold).until(
-                EC.staleness_of(self.find_locator(loc))
-            )
-        except TimeoutException:
-            self.debug("Fell into timeout in staleness_of()")
-            return False
-        return True
-
-    def select_random_membership_number(self, membership_numbers):
-        numbers = membership_numbers["membership_numbers"]
-        random_membership_num = numbers[random.randint(0,len(numbers))]
-        print(f"The random number is: {random_membership_num}")
-        return random_membership_num
-
 
